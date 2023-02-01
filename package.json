@@ -1,6 +1,6 @@
 {
   "name": "adb-loyalty-profile-component",
-  "version": "1.0.69",
+  "version": "1.0.0",
   "description": "A component for adb customer engagement",
   "repository": "https://github.com/101digital/adb-loyalty-profile-component.git",
   "main": "index.ts",
