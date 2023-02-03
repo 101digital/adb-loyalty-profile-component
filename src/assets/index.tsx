@@ -11,3 +11,4 @@ export * from './data-privacy-statement.icon';
 export * from './terms-conditions.icon';
 export * from './help-center.icon';
 export * from './login-security.icon';
+export * from './images';
