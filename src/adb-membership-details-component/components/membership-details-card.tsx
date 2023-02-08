@@ -57,16 +57,18 @@ const MembershipDetailsCard: React.FC<ICardDetails> = (props: ICardDetails) => {
                      (<Button icon={<EyeSlashIcon size={24}/>} onPress={toggleView}/>)}
         </View>
         <View style={styles.myPointsWrapper}>
-            <Text style={styles.subtitle}>My points</Text>
+            <Text style={styles.subtitle}>{i18n.t('member_plus.my_points') ?? 'My points'}</Text>
             <Button icon={<InfoIcon size={16}/>} onPress={()=> setMyPointsVisible(true)}/>
         </View>
         <View>
             <Text style={styles.pointsText}>{membershipDetailsVisible ? ('1000') : ('••••')}</Text>
         </View>
-        <View>
-            <Text style={styles.pointsExpireText}>
-              {`{${membershipDetailsVisible ? ('200') : ('•••')} pts} ${i18n.t('member_plus.membership_expired') ?? 'will be expired on'} {${membershipDetailsVisible ? ('Mar 2023') : ('••• ••••')}}`}
+        <View style={styles.flexRow}>
+            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{`{${membershipDetailsVisible ? '200' : '•••'} pts} `}</Text>
+            <Text style={[styles.pointsExpireText, styles.fontRegular]}>
+              {i18n.t('member_plus.membership_expired') ?? 'will be expired on'}
             </Text>
+            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{` {${membershipDetailsVisible ? 'Mar 2023' : '••• ••••'}}`}</Text>
         </View>
         <View style={styles.redeemBtn}>
             <Button onPress={props.onPressRedeem} label= {i18n.t('member_plus.redeem_now') ?? 'Redeem Now'} icon={<RedeemArrowIcon size={15}/>}/>
@@ -279,5 +281,14 @@ const styles = StyleSheet.create({
   },
   flatlist: {
     marginTop: 38
-  }
+  },
+  flexRow: {
+    flexDirection: 'row'
+  },
+  fontRegular: {
+    fontFamily: fonts.regular
+  },
+  fontMedium: {
+    fontFamily: fonts.medium
+  },
 });

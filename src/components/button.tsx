@@ -9,12 +9,15 @@ interface IButton {
   labelColor?: string;
   icon?: any;
   fullButton? :boolean;
+  disabled? : boolean;
 }
 const Button: React.FC<IButton> = (props: IButton) => {
   return (
     <TouchableOpacity
       onPress={props.onPress}
-      style={[props.fullButton ? styles.fullContainer : styles.container, { backgroundColor: props.background ?? '#1B1B1B' }]}
+      style={[props.fullButton ? styles.fullContainer : styles.container, 
+        { backgroundColor: props.background ?? '#1B1B1B', opacity: props.disabled ? 0.6 : 1 }]}
+      disabled={props.disabled}
     >
       <Text style={[styles.label, { color: props.labelColor ?? colors.white }]}>
         {props.label}

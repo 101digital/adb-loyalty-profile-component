@@ -15,3 +15,5 @@ export * from './eye.icon';
 export * from './image-placeholder.icon';
 export * from './info.icon';
 export * from './warning.icon';
+export * from './info-black.icon';
+export * from './correct.icon';
