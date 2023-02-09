@@ -29,7 +29,7 @@ const MembershipDetailsCard: React.FC<ICardDetails> = (props: ICardDetails) => {
     },
     {
       title: i18n.t('member_plus.faq') ?? 'FAQ', 
-      description: i18n.t('member_plus.faq_desc') ?? 'For any queries, please contact ACSM customer service or visit the nearest Aeon branch.'
+      description: i18n.t('member_plus.faq_desc') ?? 'For any queries, please contact customer care.'
     }
   ]
 

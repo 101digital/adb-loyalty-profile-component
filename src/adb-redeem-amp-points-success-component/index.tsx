@@ -19,8 +19,8 @@ const ADBRedeemAMPPointsSuccessComponent: React.FC<IRedeemPointsSuccess> = (prop
   const [redemptionErrorAlert, setredemptionErrorAlert] = useState<boolean>(false)
 
     const onPressConfirm = () => {
-        setRedemptionSuccessAlert(true)
-        // setredemptionErrorAlert(true)
+        // setRedemptionSuccessAlert(true)
+        setredemptionErrorAlert(true)
     }
 
     const onSuccessDone = () => {

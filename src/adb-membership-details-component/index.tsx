@@ -33,7 +33,7 @@ const ADBMembershipDetailsComponent: React.FC<IMembershipDetails> = (props: IMem
     </View>
     <AlertModal
         title={i18n.t('member_plus.no_info_found_err') ?? 'No information found!'}
-        message={i18n.t('member_plus.acc_sync_err_msg') ?? 'Sorry, there was an error in syncing your membership account, please feel free to contact ACSM customer service for additional information.'}
+        message={i18n.t('member_plus.acc_sync_err_msg') ?? 'Sorry, there was an error in syncing your membership account, please contact customer care if you have any additional queries.'}
         btnLabel={i18n.t('member_plus.contact_cstm_care') ?? 'Contact Customer Care'}
         subBtnLabel={i18n.t('member_plus.done') ?? 'Done'}
         icon={<WarningIcon size={55.5}/>}
