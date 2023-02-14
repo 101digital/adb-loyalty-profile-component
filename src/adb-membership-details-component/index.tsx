@@ -14,7 +14,7 @@ interface IMembershipDetails {
 const ADBMembershipDetailsComponent: React.FC<IMembershipDetails> = (props: IMembershipDetails) => {
   const { i18n } = useContext(ThemeContext);
 
-  const [syncErrorVisible, setSyncErrorVisible] = useState<boolean>(true)
+  const [syncErrorVisible, setSyncErrorVisible] = useState<boolean>(false)
   const [accountCreationError, setAccountCreationError] = useState<boolean>(false)
 
   return (

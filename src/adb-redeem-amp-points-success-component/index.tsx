@@ -6,6 +6,9 @@ import { ThemeContext } from 'react-native-theme-component';
 import { WarningIcon, CorrectIcon } from '../assets/icons'
 import AlertModal from 'adb-loyalty-profile-component/src/components/alert-modal';
 import Button from 'adb-loyalty-profile-component/src/components/button';
+import { LoyaltyPointsContext } from '../contexts'
+import { NumberFormatter, thousandSeparator } from '../components/common'
+
 
 interface IRedeemPointsSuccess {
   navigateMembershipHome: () => void;
@@ -14,6 +17,8 @@ interface IRedeemPointsSuccess {
 const ADBRedeemAMPPointsSuccessComponent: React.FC<IRedeemPointsSuccess> = (props: IRedeemPointsSuccess) => {
   const { i18n } = useContext(ThemeContext);
   const { navigateMembershipHome } = props
+
+  const { redeemingPts, redeemingRealValue, remainingPts } = useContext(LoyaltyPointsContext)
 
   const [redemptionSuccessAlert, setRedemptionSuccessAlert] = useState<boolean>(false)
   const [redemptionErrorAlert, setredemptionErrorAlert] = useState<boolean>(false)
@@ -47,15 +52,15 @@ const ADBRedeemAMPPointsSuccessComponent: React.FC<IRedeemPointsSuccess> = (prop
         <View style={styles.historyContainer}>
             <View style={styles.redeemHistoryDetRow}>
                 <Text style={styles.historyTitletxt}>{i18n.t('member_plus.csh_redemption_amt') ?? 'Cash redemption amount'}</Text>
-                <Text style={styles.historyValTxt}>RM 2.00</Text>
+                <Text style={styles.historyValTxt}>RM {NumberFormatter(redeemingRealValue, 2)}</Text>
             </View>
             <View style={styles.redeemHistoryDetRow}>
                 <Text style={styles.historyTitletxt}>{i18n.t('member_plus.pts_used') ?? 'Points used'}</Text>
-                <Text style={styles.historyValTxt}>400 pts</Text>
+                <Text style={styles.historyValTxt}>{thousandSeparator(redeemingPts)} pts</Text>
             </View>
             <View style={styles.redeemHistoryDetRow}>
                 <Text style={styles.historyTitletxt}>{i18n.t('member_plus.pts_balance') ?? 'Points balance'}</Text>
-                <Text style={styles.historyValTxt}>600 pts</Text>
+                <Text style={styles.historyValTxt}>{thousandSeparator(remainingPts)} pts</Text>
             </View>
         </View>
         <View style={styles.coversionDetails}>

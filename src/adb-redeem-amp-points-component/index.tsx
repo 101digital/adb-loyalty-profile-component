@@ -10,6 +10,7 @@ import AlertModal from 'adb-loyalty-profile-component/src/components/alert-modal
 import Button from 'adb-loyalty-profile-component/src/components/button';
 import PointsCard from './components/points-card';
 import RedeemDetailsCard from './components/redeem-details-card';
+import { LoyaltyPointsContext } from '../contexts'
 
 interface IRedeemPoints {
   onPressContinue: () => void;
@@ -19,18 +20,16 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
   const { i18n } = useContext(ThemeContext);
   const { onPressContinue } = props;
 
+  const { redeemablePts, expiringPts, expireDate, redeemingPts, setRedeemPointsValue, setConversionValues, redeemingRealValue, remainingPts } = useContext(LoyaltyPointsContext)
+
   const conversionPoints = 200;
   const conversionRM = '1.00';
-  const myPoints = 1000;
   const incrementOf = 200; 
 
   const [redeemPointsVisible, setRedeemPointsVisible] = useState<boolean>(false)
   const [redemptionDescVisible, setRedemptionDescVisible] = useState<boolean>(false)
   const [notEnoughPtsErr, setNotEnoughPtsErr] = useState<boolean>(false)
   const [incrementErr, setIncrementErr] = useState<boolean>(false)
-  const [redeemPoints, setRedeemPoints] = useState<string>('0');
-  const [redeemRM, setRedeemRM] = useState<string>('')
-  const [remainingPoints, setRemainingPoints] = useState<string>('')
   const [inputActive, setInputActive] = useState<boolean>(false);
 
   useEffect(()=> {
@@ -38,12 +37,12 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
   }, [])
 
   const checkIncrement = () => {
-    const increment = Number(removeNonNumeric(redeemPoints))/incrementOf;
+    const increment = Number(removeNonNumeric(redeemingPts))/incrementOf;
     return Number.isInteger(increment) ? false : true;
   }
 
   const checkEnoughPts = () => {
-    const amount = myPoints - Number(removeNonNumeric(redeemPoints));
+    const amount = Number(redeemablePts) - Number(removeNonNumeric(redeemingPts));
     return amount < 0 ? true : false;
   }
 
@@ -59,10 +58,9 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
 
   const calculatePointsInfo = (redeemAmount: string) => {
     const redeemRMAmount = NumberFormatter((Number(removeNonNumeric(redeemAmount))/incrementOf).toString(), 2)
-    setRedeemRM(redeemRMAmount)
+    const remPoints = thousandSeparator((Number(redeemablePts) - Number(removeNonNumeric(redeemAmount))).toString())
 
-    const remPoints = thousandSeparator((myPoints - Number(removeNonNumeric(redeemAmount))).toString())
-    setRemainingPoints(remPoints)
+    setConversionValues(redeemRMAmount, remPoints)
   }
 
   const handleOnFocus = (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
@@ -77,7 +75,7 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
   const borderColor = inputActive ? '#1B1B1B' : '#C2C2C2'
 
   const handleOnChangeText = (x: string) => {
-    setRedeemPoints(thousandSeparator(removeNonNumeric(x)));
+    setRedeemPointsValue(thousandSeparator(removeNonNumeric(x)))
     calculatePointsInfo(x);
   }
 
@@ -89,7 +87,7 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
                 <Text style={styles.title}>{i18n.t('member_plus.redeem') ?? 'Redeem'}</Text>
             </View>
         </View>
-        <PointsCard myPoints={myPoints}/>
+        <PointsCard myPoints={redeemablePts} expirePoints={expiringPts} expireDate={expireDate}/>
         <View style={styles.myPointsWrapper}>
             <Text style={styles.redeemPtsTxt}>{i18n.t('member_plus.redeem_points') ?? 'Redeem points'}</Text>
             <Button icon={<InfoBlackIcon size={16}/>} background={'#FFFFFF'} onPress={() => setRedeemPointsVisible(true)}/>
@@ -97,7 +95,7 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
         <View style={styles.fullWidth}>
             <View style={styles.rowInput}>
                <TextInput style={[styles.inputText, {borderBottomColor: borderColor}]} 
-               onChangeText={(x) => handleOnChangeText(x)} defaultValue={redeemPoints}
+               onChangeText={(x) => handleOnChangeText(x)} defaultValue={redeemingPts}
                onFocus={handleOnFocus}
                onBlur={handleOnBlur}
                keyboardType='number-pad'
@@ -109,12 +107,12 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
             <Text style={styles.conversionTxt}>{i18n.t('member_plus.conversion') ?? 'Conversion'}:</Text>
             <Text style={styles.conversionValTxt}> {conversionPoints} pts = RM {conversionRM}.</Text>
         </View>
-        <RedeemDetailsCard showRedemptionDesc={() => setRedemptionDescVisible(true)} rmAmount={redeemRM} remainingAmount={remainingPoints}/>
+        <RedeemDetailsCard showRedemptionDesc={() => setRedemptionDescVisible(true)} rmAmount={redeemingRealValue} remainingAmount={remainingPts}/>
     </View>
     <View style={styles.footer}>
         <Button label={i18n.t('member_plus.continue') ?? 'Continue'} 
           fullButton={true} onPress={nextClick}
-          disabled={redeemPoints==='0' || redeemPoints===''}
+          disabled={redeemingPts==='0' || redeemingPts===''}
           />
     </View>
     <AlertModal

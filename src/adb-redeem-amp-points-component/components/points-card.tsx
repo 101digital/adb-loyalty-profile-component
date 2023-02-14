@@ -5,7 +5,9 @@ import { ThemeContext } from 'react-native-theme-component';
 import { thousandSeparator } from '../../components/common'
 
 interface IPointsCard {
-  myPoints: number
+  myPoints: string,
+  expirePoints: string,
+  expireDate: string
 }
 
 const PointsCard: React.FC<IPointsCard> = (props: IPointsCard) => {
@@ -18,14 +20,14 @@ const PointsCard: React.FC<IPointsCard> = (props: IPointsCard) => {
             <Text style={styles.subtitle}>{i18n.t('member_plus.my_points') ?? 'My points'}</Text>
         </View>
         <View>
-            <Text style={styles.pointsText}>{thousandSeparator(props.myPoints.toString())}</Text>
+            <Text style={styles.pointsText}>{thousandSeparator(props.myPoints)}</Text>
         </View>
         <View style={styles.flexRow}>
-            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{'{200 pts}'}</Text>
+            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{`{${props.expirePoints}}`}</Text>
             <Text style={[styles.pointsExpireText, styles.fontRegular]}>
               {i18n.t('member_plus.membership_expired') ?? 'will be expired on'}
             </Text>
-            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{'{Mar 2023}'}</Text>
+            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{`{${props.expireDate}}`}</Text>
         </View>
     </View>
   );

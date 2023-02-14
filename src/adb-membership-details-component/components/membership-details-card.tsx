@@ -1,10 +1,12 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, NativeModules, LayoutAnimation, SafeAreaView, FlatList } from 'react-native';
 import { colors, fonts, images } from '../../assets';
 import Button from 'adb-loyalty-profile-component/src/components/button'
 import { RedeemArrowIcon, EyeSlashIcon, EyeIcon, InfoIcon, ImagePlaceHolderIcon } from '../../assets/icons'
 import { Image, BottomSheet, ThemeContext } from 'react-native-theme-component';
 import { CloseIcon } from 'react-native-theme-component/src/assets';
+import { thousandSeparator } from '../../components/common'
+import { LoyaltyPointsContext } from '../../contexts'
 
 interface ICardDetails {
   onPressRedeem?: () => void;
@@ -13,6 +15,8 @@ interface ICardDetails {
 const MembershipDetailsCard: React.FC<ICardDetails> = (props: ICardDetails) => {
 
   const { i18n } = useContext(ThemeContext);
+
+  const { redeemablePts, expiringPts, expireDate, setInitialValues } = useContext(LoyaltyPointsContext);
 
   const {UIManager} = NativeModules;
   UIManager.setLayoutAnimationEnabledExperimental &&
@@ -32,6 +36,15 @@ const MembershipDetailsCard: React.FC<ICardDetails> = (props: ICardDetails) => {
       description: i18n.t('member_plus.faq_desc') ?? 'For any queries, please contact customer care.'
     }
   ]
+
+  const redeemPoints = '1000';
+  const expirePoints = '200';
+  const rmexpireDate = 'Mar 2023'
+ 
+  
+  useEffect(() => {
+    setInitialValues(redeemPoints, expirePoints, rmexpireDate)
+  })
 
   const toggleView = () => {
     LayoutAnimation.configureNext({
@@ -61,14 +74,14 @@ const MembershipDetailsCard: React.FC<ICardDetails> = (props: ICardDetails) => {
             <Button icon={<InfoIcon size={16}/>} onPress={()=> setMyPointsVisible(true)}/>
         </View>
         <View>
-            <Text style={styles.pointsText}>{membershipDetailsVisible ? ('1000') : ('••••')}</Text>
+            <Text style={styles.pointsText}>{membershipDetailsVisible ? thousandSeparator(redeemablePts) : ('••••')}</Text>
         </View>
         <View style={styles.flexRow}>
-            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{`{${membershipDetailsVisible ? '200' : '•••'} pts} `}</Text>
+            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{`{${membershipDetailsVisible ? thousandSeparator(expiringPts) : '•••'} pts} `}</Text>
             <Text style={[styles.pointsExpireText, styles.fontRegular]}>
               {i18n.t('member_plus.membership_expired') ?? 'will be expired on'}
             </Text>
-            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{` {${membershipDetailsVisible ? 'Mar 2023' : '••• ••••'}}`}</Text>
+            <Text style={[styles.pointsExpireText, styles.fontMedium]}>{` {${membershipDetailsVisible ? expireDate : '••• ••••'}}`}</Text>
         </View>
         <View style={styles.redeemBtn}>
             <Button onPress={props.onPressRedeem} label= {i18n.t('member_plus.redeem_now') ?? 'Redeem Now'} icon={<RedeemArrowIcon size={15}/>}/>
