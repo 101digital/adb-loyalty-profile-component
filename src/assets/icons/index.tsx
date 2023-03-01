@@ -18,3 +18,4 @@ export * from './warning.icon';
 export * from './info-black.icon';
 export * from './correct.icon';
 export * from './gift.icon';
+export * from './error.icon';

@@ -4,7 +4,7 @@ import { colors } from '../assets';
 import { fonts } from '../assets/fonts';
 import { ThemeContext, InputField, BottomSheet } from 'react-native-theme-component';
 import { CloseIcon } from 'react-native-theme-component/src/assets';
-import { WarningIcon, InfoBlackIcon } from '../assets/icons'
+import { WarningIcon, InfoBlackIcon, ErrorIcon } from '../assets/icons'
 import { NumberFormatter, thousandSeparator, removeNonNumeric } from '../components/common'
 import AlertModal from 'adb-loyalty-profile-component/src/components/alert-modal';
 import Button from 'adb-loyalty-profile-component/src/components/button';
@@ -31,6 +31,8 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
   const [notEnoughPtsErr, setNotEnoughPtsErr] = useState<boolean>(false)
   const [incrementErr, setIncrementErr] = useState<boolean>(false)
   const [inputActive, setInputActive] = useState<boolean>(false);
+
+  const shortRedeemTerms = ["200", "400", "600", "Half", "Max"]
 
   useEffect(()=> {
     calculatePointsInfo('0');
@@ -65,11 +67,17 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
 
   const handleOnFocus = (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setInputActive(true);
-
   };
 
   const handleOnBlur = (event: NativeSyntheticEvent<TextInputFocusEventData>) => {
     setInputActive(false);
+    setNotEnoughPtsErr(false)
+    setIncrementErr(false)
+    if(checkEnoughPts()){
+      setNotEnoughPtsErr(true)
+    }else if(checkIncrement()){
+      setIncrementErr(true)
+    }
   };
 
   const borderColor = inputActive ? '#1B1B1B' : '#C2C2C2'
@@ -77,6 +85,67 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
   const handleOnChangeText = (x: string) => {
     setRedeemPointsValue(thousandSeparator(removeNonNumeric(x)))
     calculatePointsInfo(x);
+  }
+
+  const setShortTermsRedeems = async(term: string) => {
+    switch(term){
+      case '200':
+        setRedeemPointsValue(thousandSeparator(removeNonNumeric("200")))
+        calculatePointsInfo("200");
+        if(Number(removeNonNumeric(redeemablePts)) < 200){
+          setNotEnoughPtsErr(true)
+        }else{
+          setNotEnoughPtsErr(false)
+        }
+        break;
+      case '400':
+        setRedeemPointsValue(thousandSeparator(removeNonNumeric("400")))
+        calculatePointsInfo("400");
+        if(Number(removeNonNumeric(redeemablePts)) < 400){
+          setNotEnoughPtsErr(true)
+        }else{
+          setNotEnoughPtsErr(false)
+        }
+        break;
+      case '600':
+        setRedeemPointsValue(thousandSeparator(removeNonNumeric("600")))
+        calculatePointsInfo("600");
+        if(Number(removeNonNumeric(redeemablePts)) < 600){
+          setNotEnoughPtsErr(true)
+        }else{
+          setNotEnoughPtsErr(false)
+        }
+        break;
+      case 'Half':
+        setNotEnoughPtsErr(false)
+        const half =  Math.round(Number(removeNonNumeric(redeemablePts))/2);
+        const increment = half/incrementOf;
+        const isIncrement = Number.isInteger(increment) ? false : true;
+        let i = 0;
+        if(isIncrement){
+          while(i < half){
+            i = i+200;
+          }
+        }
+        const halfValue = isIncrement ? i : half
+        setRedeemPointsValue(thousandSeparator(removeNonNumeric(halfValue.toString())))
+        calculatePointsInfo(halfValue.toString());
+        break;
+      case 'Max':
+        setNotEnoughPtsErr(false)
+        const max = Number(removeNonNumeric(redeemablePts))/incrementOf;
+        const isMaxIncrement = Number.isInteger(max) ? false : true;
+        let n = 0;
+        if(isMaxIncrement){
+          while(n <= Number(removeNonNumeric(redeemablePts))){
+            n = n+200;
+          }
+        }
+        const maxValue = isMaxIncrement ? n - incrementOf : redeemablePts
+        setRedeemPointsValue(thousandSeparator(removeNonNumeric(maxValue.toString())))
+        calculatePointsInfo(maxValue.toString());
+        break;      
+    }
   }
 
   return (
@@ -103,6 +172,35 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
                />
             </View>
         </View>
+      {(notEnoughPtsErr || incrementErr) &&
+        <View style={styles.flexDirectionRow}>
+          <View style={styles.errIcon}>
+            <ErrorIcon size={13}/>
+          </View>
+          {notEnoughPtsErr && 
+            <View style={styles.textWrap}>
+              <Text style={styles.errMessageText}>{i18n.t('member_plus.notEnoughPtsErr')}</Text>
+            </View>
+          }
+          {incrementErr && 
+            <View style={styles.textWrap}>
+              <Text style={styles.errMessageText}>{i18n.t('member_plus.notIncrementingErr')}</Text>
+            </View>
+          }
+          </View>
+      }
+        {Number(removeNonNumeric(redeemablePts)) >= incrementOf &&
+        <View style={styles.shortRedeemContainer}>
+          {shortRedeemTerms.map((terms, index) => {
+            return (          
+            <TouchableOpacity onPress={()=> setShortTermsRedeems(terms) }>
+              <View style={[styles.shortRedeemBtn, index != 0 ? styles.gap : {}]}>
+                <Text>{terms}</Text>
+              </View>
+            </TouchableOpacity>);
+          })} 
+        </View>
+        }
         <View style={styles.coversionDetails}>
             <Text style={styles.conversionTxt}>{i18n.t('member_plus.conversion') ?? 'Conversion'}:</Text>
             <Text style={styles.conversionValTxt}> {conversionPoints} pts = RM {conversionRM}.</Text>
@@ -112,25 +210,9 @@ const ADBRedeemPointsComponent: React.FC<IRedeemPoints> = (props: IRedeemPoints)
     <View style={styles.footer}>
         <Button label={i18n.t('member_plus.continue') ?? 'Continue'} 
           fullButton={true} onPress={nextClick}
-          disabled={redeemingPts==='0' || redeemingPts===''}
+          disabled={redeemingPts==='0' || redeemingPts==='' || notEnoughPtsErr || incrementErr}
           />
     </View>
-    <AlertModal
-        title={i18n.t('member_plus.notEnoughPtsErr') ?? 'You do not have enough points for this redemption!'}
-        btnLabel={i18n.t('member_plus.done') ?? 'Done'}
-        icon={<WarningIcon size={55.5}/>}
-        isVisible={notEnoughPtsErr}
-        onConfirmBtnPress={()=>setNotEnoughPtsErr(false)}
-        onBackdropPress={() => setNotEnoughPtsErr(false)}
-      />
-    <AlertModal
-        title={i18n.t('member_plus.notIncrementingErr') ?? 'You can only redeem points in increments of 200!'}
-        btnLabel={i18n.t('member_plus.done') ?? 'Done'}
-        icon={<WarningIcon size={55.5}/>}
-        isVisible={incrementErr}
-        onConfirmBtnPress={()=>setIncrementErr(false)}
-        onBackdropPress={() => setIncrementErr(false)}
-      />      
       <BottomSheet isVisible={redeemPointsVisible} onBackdropPress={() => setRedeemPointsVisible(false)} children={
         <View style={styles.bottomSheetInfobsContainer}>
             <>
@@ -267,4 +349,42 @@ const styles = StyleSheet.create({
   bottomSheetInfobsContainer: {
     padding: 24,
   },
+  shortRedeemContainer: {
+    flexDirection: 'row',
+    marginBottom: 16
+  },
+  shortRedeemBtn: {
+    borderRadius: 46,
+    borderWidth: 1,
+    borderColor: '#1B1B1B',
+    width: 60,
+    height: 33,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  gap:{
+    marginLeft: 10
+  },
+  flexDirectionRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    marginTop: -2,
+  },
+  errMessageText: {
+    fontSize: 12,
+    fontFamily: fonts.medium,
+    color: '#858585',
+    
+  },
+  textWrap: {
+    flex: 1,
+    alignContent: 'center',
+    alignSelf: 'center',
+  },
+  errIcon: {
+    alignContent: 'center',
+    alignSelf: 'center',
+    margin: 8
+  }
 });

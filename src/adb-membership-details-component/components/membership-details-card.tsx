@@ -37,7 +37,7 @@ const MembershipDetailsCard: React.FC<ICardDetails> = (props: ICardDetails) => {
     }
   ]
 
-  const redeemPoints = '1000';
+  const redeemPoints = '1100';
   const expirePoints = '200';
   const rmexpireDate = 'Mar 2023'
  
